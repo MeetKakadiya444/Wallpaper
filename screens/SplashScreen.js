@@ -4,11 +4,10 @@ import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-nat
 import { horizontalScale, verticalScale } from "../Utils"
 
 export default function SplashScreen({ navigation }) {
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            navigation.navigate("");
-        }, 1000);
-    }, [navigation]);
+    const handleSkip = () => {
+        navigation.navigate("HomeScreen");
+    };
+     
     return (
         <SafeAreaView style={{ backgroundColor: "#FFFFFF", flex: 1, alignItems: "center" }}>
             <View style={{ marginTop: 30, height: '57%', width: '100%', alignItems: 'center' }}>
@@ -22,7 +21,7 @@ export default function SplashScreen({ navigation }) {
                 <Text style={{ color: "#A09898", fontSize: 18, fontWeight: '400', marginTop: 10 }}>Let’s go to explorer.</Text>
             </View>
             <View style={{ height: '10%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                <TouchableOpacity style={{ backgroundColor: "#4794FF", height: 40, width: 106, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={handleSkip} style={{ backgroundColor: "#4794FF", height: 40, width: 106, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: "#363D3F" }}>GO!</Text>
                 </TouchableOpacity>
             </View>
