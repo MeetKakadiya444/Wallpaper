@@ -29,10 +29,10 @@ export default function ImageScreen({ route, navigation }) {
                 const data = await getPhotosFromApi(collectionId, currentPage);
                 console.log(data);
 
-                const newImages = data.map(photo => ({
-                    imageurl: photo.urls.small
+                const newImages = data.map(photo => ({// use for navigation full image second screen
+                    small: photo.urls.small,
+                    regular: photo.urls.regular,
                 }));
-
                 const existingImageUrls = new Set(images.map(image => image.imageurl));
                 const filteredImages = newImages.filter(image => !existingImageUrls.has(image.imageurl));
                 setImages(prevImages => [...prevImages, ...filteredImages]);
@@ -53,9 +53,12 @@ export default function ImageScreen({ route, navigation }) {
     };
 
     const renderItem = ({ item }) => (
-        <TouchableOpacity style={styles.itemContainer1}>
-            <Image source={{ uri: item.imageurl }} style={styles.image} />
-        </TouchableOpacity>
+        <TouchableOpacity 
+        style={styles.itemContainer1} 
+        onPress={() => navigation.navigate('ImageWallpaperScreen', { imageUrl: item.regular})}
+    >
+        <Image source={{ uri: item.small }} style={styles.image} />
+    </TouchableOpacity>
     );
 
     return (
@@ -65,8 +68,8 @@ export default function ImageScreen({ route, navigation }) {
                     <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} />
                 </TouchableOpacity>
             </View>
-
-            <FlatList
+ 
+            <FlatList style={styles. flatListContainer}
                 showsVerticalScrollIndicator={false}
                 data={images}
                 renderItem={renderItem}
@@ -96,23 +99,23 @@ const styles = StyleSheet.create({
     },
     imageview: {
         height:responsiveHeight(8),
-        width:responsiveWidth(95),
-        justifyContent:'center'
+        width:responsiveWidth(92),
+        justifyContent:'center', 
         
     },
     arrowButton: {
-        height: 35,
-        width: 35,
+        height: responsiveHeight(5),
+        width: responsiveWidth(10.6),
         backgroundColor: "#FFFFFF",
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginLeft: 8,
         elevation: 20,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
         shadowOpacity: 1,
         shadowRadius: 9,
+        
     },
     arrowIcon: {
         height: 15,
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 12,
     },
-    flatListContainer1: {
+    flatListContainer: {
         flex: 1,
         shadowColor: "#000000",
         shadowOffset: { width: 3, height: 5 },
