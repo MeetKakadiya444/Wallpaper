@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
         backgroundColor:"#EFF0F0"
     },
 
-
     imageview: {
         height: responsiveHeight(8),
         width: responsiveWidth(92),
@@ -82,7 +81,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between'
     },
-
 
     closeButton: {
         height: responsiveHeight(5),
@@ -98,13 +96,11 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     closeIcon: {
         height: 14,
         width: 14,
         tintColor: "#929292"
     },
-
 
     dotButton: {
         height: responsiveHeight(5),
@@ -120,13 +116,11 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
 
-
     dotIcon: {
         height: 20,
         width: 5,
         tintColor: "#929292"
     },
-
 
     container: {
         justifyContent: 'center',
@@ -141,14 +135,12 @@ const styles = StyleSheet.create({
         marginBottom:10,     
     },
 
-
     image: {
         width: responsiveWidth(92),
         height: responsiveScreenHeight(72),
         borderRadius: 20,
     },
-
-    
+   
     shadowContainer: {
         height: responsiveHeight(8),
         width: responsiveWidth(92),
@@ -165,7 +157,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 
-
     homeButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -180,7 +171,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
-
     
     paintButton: {
         height: responsiveHeight(5),
@@ -197,7 +187,6 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     likeButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.6),
@@ -212,7 +201,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
-
 
     cropButton: {
         height: responsiveHeight(5),
@@ -229,7 +217,6 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     downloadButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -245,13 +232,11 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     homeIcon: {
         height: 18,
         width: 20.5,
         tintColor: "#929292"
     },
-
 
     paintIcon: {
         height: 18,
@@ -259,13 +244,11 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-
     likeIcon: {
         height: 16,
         width: 18,
         tintColor: "#929292"
     },
-
 
     cropIcon: {
         height: 20,
@@ -273,26 +256,21 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-
     downloadIcon: {
         height: 22,
         width: 15.5,
         tintColor: "#929292"
     },
 
-
     selectedIconButton: {
         backgroundColor: '#F3F3F3',
     },
-
 
     selectedIcon: {
         tintColor: '#4794FF',
     },
 
-
     selectedIcon1: {
         tintColor: '#FA3F3F',
     },
-
 });

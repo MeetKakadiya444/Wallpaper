@@ -9,6 +9,8 @@ export default function CollectionScreen({ navigation }) {
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedQuery] = useDebounce(searchQuery); // Debounce search query
+    const [isDropdownVisible, setDropdownVisible] = useState(false);
+
 
     const ACCESS_KEY = 'a82f6bf78409bb9e7f0921a410d9d693d06b98a2d5df9a9cdc8295ab3cb261c1';
 
@@ -109,11 +111,30 @@ export default function CollectionScreen({ navigation }) {
                         <TouchableOpacity style={styles.searchButton} onPress={() => setIsSearchVisible(true)}>
                             <Image source={require('../assets/search.png')} style={styles.searchIcon} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.dotButton}>
+                        <TouchableOpacity
+                            style={styles.dotButton}
+                            onPress={() => setDropdownVisible(!isDropdownVisible)}
+                        >
                             <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
+                        </TouchableOpacity>
+
+                    </View>
+
+                )}
+                {isDropdownVisible && (
+                    <View style={styles.dropdownMenu}>
+                        <TouchableOpacity style={styles.dropdownItem}>
+                            <Text style={styles.dropdownText}>Privacy Policy</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.dropdownItem}>
+                            <Text style={styles.dropdownText}>Rate Us</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.dropdownItem}>
+                            <Text style={styles.dropdownText}>Share App</Text>
                         </TouchableOpacity>
                     </View>
                 )}
+
             </View>
 
             <View style={styles.flatListContainerWrapper}>
@@ -137,6 +158,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#EFF0F0",
         alignItems: 'center'
     },
+
     imageview: {
         height: responsiveHeight(8),
         width: responsiveWidth(95),
@@ -144,6 +166,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+
     arrowButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -157,6 +180,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
+
     searchButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -171,6 +195,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
+
     dotButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -185,27 +210,32 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 8,
     },
+
     arrowIcon: {
         height: 15,
         width: 17.5,
         tintColor: "#929292"
     },
+
     searchIcon: {
         height: 14,
         width: 14,
         tintColor: "#929292",
     },
+
     dotIcon: {
         height: 20,
         width: 5,
         tintColor: "#929292"
     },
+
     flatListContainerWrapper: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 5
     },
+
     flatListContainer: {
         flex: 1,
         elevation: 5,
@@ -214,6 +244,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 5,
     },
+
     collection: {
         height: responsiveHeight(23),
         width: responsiveWidth(95),
@@ -222,31 +253,37 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden'
     },
+
     coverImage: {
         height: '100%',
         width: '100%',
         resizeMode: 'cover',
     },
+
     titleContainer: {
         width: '100%',
         height: '30%',
         justifyContent: 'center',
     },
+
     title: {
         fontSize: responsiveFontSize(2.9),
         color: "#FFFFFF",
         marginLeft: 25
     },
+
     totalPhotosContainer: {
         width: '95%',
         height: '60%',
         justifyContent: 'flex-end',
         alignItems: 'flex-end'
     },
+
     total_photos: {
         fontSize: responsiveFontSize(2.3),
         color: "#FFFFFF"
     },
+
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -254,6 +291,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(87),
         height: responsiveHeight(5.5),
     },
+
     searchInput: {
         width: responsiveWidth(68),
         height: responsiveHeight(5.5),
@@ -267,9 +305,36 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
+
     searchIconContainer: {
         flexDirection: 'row',
         width: responsiveWidth(28),
 
+    },
+
+    dropdownMenu: {
+        position: 'absolute',
+        top: responsiveHeight(9),
+        right: responsiveWidth(0),
+        width: responsiveWidth(40),
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 10,
+        elevation: 20,
+        shadowColor: "#000000",
+        shadowOffset: { width: 6, height: 6 },
+        shadowOpacity: 1,
+        shadowRadius: 9,
+        zIndex:1
+    },
+
+    dropdownItem: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    
+    dropdownText: {
+        fontSize: responsiveFontSize(1.7),
+        color: '#898989',
     }
 });

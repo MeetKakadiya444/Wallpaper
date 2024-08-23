@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity ,Text} from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth, } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,6 +9,8 @@ export default function ImageWallpaperScreen({ route, navigation }) {
         navigation.navigate("HomeScreen");
     };
     const [selected, setSelected] = useState('home');
+    const [isDropdownVisible, setDropdownVisible] = useState(false);
+
 
     return (
         <SafeAreaView style={styles.SafeAreaView}>
@@ -16,10 +18,26 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                 <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
                     <Image source={require('../assets/close.png')} style={styles.closeIcon} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.dotButton}>
+                <TouchableOpacity
+                    style={styles.dotButton}
+                    onPress={() => setDropdownVisible(!isDropdownVisible)}
+                >
                     <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
                 </TouchableOpacity>
             </View>
+            {isDropdownVisible && (
+                <View style={styles.dropdownMenu}>
+                    <TouchableOpacity style={styles.dropdownItem}>
+                        <Text style={styles.dropdownText}>Privacy Policy</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.dropdownItem}>
+                        <Text style={styles.dropdownText}>Rate Us</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.dropdownItem}>
+                        <Text style={styles.dropdownText}>Share App</Text>
+                    </TouchableOpacity>
+                </View>
+            )}          
 
             <View style={styles.container}>
                 <Image
@@ -72,7 +90,6 @@ const styles = StyleSheet.create({
         backgroundColor:"#EFF0F0"
     },
 
-
     imageview: {
         height: responsiveHeight(8),
         width: responsiveWidth(92),
@@ -80,7 +97,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between'
     },
-
 
     closeButton: {
         height: responsiveHeight(5),
@@ -96,13 +112,11 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     closeIcon: {
         height: 14,
         width: 14,
         tintColor: "#929292"
     },
-
 
     dotButton: {
         height: responsiveHeight(5),
@@ -118,13 +132,11 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
     },
 
-
     dotIcon: {
         height: 20,
         width: 5,
         tintColor: "#929292"
     },
-
 
     container: {
         justifyContent: 'center',
@@ -139,14 +151,12 @@ const styles = StyleSheet.create({
         marginBottom:10,     
     },
 
-
     image: {
         width: responsiveWidth(92),
         height: responsiveScreenHeight(72),
         borderRadius: 20,
     },
-
-    
+   
     shadowContainer: {
         height: responsiveHeight(8),
         width: responsiveWidth(92),
@@ -163,7 +173,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 
-
     homeButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -178,7 +187,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
-
     
     paintButton: {
         height: responsiveHeight(5),
@@ -195,7 +203,6 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     likeButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.6),
@@ -210,7 +217,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 9,
     },
-
 
     cropButton: {
         height: responsiveHeight(5),
@@ -227,7 +233,6 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     downloadButton: {
         height: responsiveHeight(5),
         width: responsiveWidth(10.5),
@@ -243,13 +248,11 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-
     homeIcon: {
         height: 18,
         width: 20.5,
         tintColor: "#929292"
     },
-
 
     paintIcon: {
         height: 18,
@@ -257,13 +260,11 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-
     likeIcon: {
         height: 16,
         width: 18,
         tintColor: "#929292"
     },
-
 
     cropIcon: {
         height: 20,
@@ -271,26 +272,48 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-
     downloadIcon: {
         height: 22,
         width: 15.5,
         tintColor: "#929292"
     },
 
-
     selectedIconButton: {
         backgroundColor: '#F3F3F3',
     },
-
 
     selectedIcon: {
         tintColor: '#4794FF',
     },
 
-
     selectedIcon1: {
         tintColor: '#FA3F3F',
     },
 
+    dropdownMenu: {
+        position: 'absolute',
+        top: responsiveHeight(9),
+        right: responsiveWidth(4),
+        width: responsiveWidth(40),
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 10,
+        elevation: 20,
+        shadowColor: "#000000",
+        shadowOffset: { width: 6, height: 6 },
+        shadowOpacity: 1,
+        shadowRadius: 9,
+        zIndex: 1
+    },
+
+    dropdownItem: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+
+    dropdownText: {
+        fontSize: responsiveFontSize(1.7),
+        color: '#898989',
+    }
 });
+                     
