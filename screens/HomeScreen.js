@@ -20,6 +20,13 @@ export default function HomeScreen({ navigation }) {
     const [apiType, setApiType] = useState('latest');
     const [selected, setSelected] = useState('home');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const handleSkip1 = () => {
+        navigation.navigate("LikeScreen");
+    };
+    const handleSkip2 = () => {
+        navigation.navigate("DownloadScreen");
+    };
+
 
     useEffect(() => {
         const fetchImages = async () => {
@@ -158,13 +165,13 @@ export default function HomeScreen({ navigation }) {
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity onPressIn={handleSkip1}
                     onPress={() => setSelected('like')}
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                <TouchableOpacity onPressIn={handleSkip2}
                     onPress={() => setSelected('download')}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />

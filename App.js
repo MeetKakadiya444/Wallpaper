@@ -9,8 +9,8 @@ import ImageScreen from "./screens/ImageScreen";
 import ImageWallpaperScreen from "./screens/ImageWallpaperScreen";
 import SearchScreen from "./screens/SearchScreen";
 import SearchWallpaperScreen from "./screens/SearchWallpaperScreen";
-
-
+import LikeScreen from "./screens/LikeScreen";
+import  DownloadScreen from "./screens/DownloadScreen";
 
  
  
@@ -28,7 +28,8 @@ export default function App(){
         <Stack.Screen name="ImageWallpaperScreen" component={ImageWallpaperScreen}></Stack.Screen>
         <Stack.Screen name="SearchScreen" component={SearchScreen}></Stack.Screen>
         <Stack.Screen name="SearchWallpaperScreen" component={SearchWallpaperScreen}></Stack.Screen>
-       
+        <Stack.Screen name="LikeScreen" component={LikeScreen}></Stack.Screen>
+        <Stack.Screen name="DownloadScreen" component={DownloadScreen}></Stack.Screen>
         
         
     </Stack.Navigator>

@@ -16,12 +16,12 @@ export default function ImageWallpaperScreen({ route, navigation }) {
         <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.imageview}>
                 <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
-                    <Image source={require('../assets/close.png')} style={styles.closeIcon} />
-                </TouchableOpacity>
+                    <Image source={require('../assets/close.png')} style={styles.closeIcon} />    
+                </TouchableOpacity>   
                 <TouchableOpacity
                     style={styles.dotButton}
                     onPress={() => setDropdownVisible(!isDropdownVisible)}
-                >
+                > 
                     <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
                 </TouchableOpacity>
             </View>

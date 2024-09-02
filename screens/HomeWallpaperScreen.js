@@ -1,15 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { openDatabase } from "react-native-sqlite-storage"; 
+
+// Initialize SQLite database
+const db = openDatabase({ name: 'wallpaper.db' });
 
 export default function HomeWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
+
     const handleSkip = () => {
         navigation.navigate("HomeScreen");
     };
+
     const [selected, setSelected] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+    useEffect(() => {
+        // Create table if it doesn't exist
+        db.transaction(tx => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"  
+            );
+        });
+    }, []);
+
+    const handleLike = () => {
+        // Insert the liked wallpaper into the SQLite database
+        db.transaction(tx => {
+            tx.executeSql(
+                "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                [imageUrl],
+                () => {
+                    Alert.alert('Success', 'Wallpaper liked and saved!');
+                    setSelected('like');
+                },
+                error => {
+                    console.error(error);
+                }
+            );
+        });
+    };
 
     return (
         <SafeAreaView style={styles.SafeAreaView}>
@@ -60,7 +92,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => setSelected('like')}
+                    onPress={handleLike} // Call handleLike on button press
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
@@ -291,27 +323,24 @@ const styles = StyleSheet.create({
 
     dropdownMenu: {
         position: 'absolute',
-        top: responsiveHeight(9),
+        top: responsiveHeight(7),
         right: responsiveWidth(4),
-        width: responsiveWidth(40),
         backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        padding: 10,
-        elevation: 20,
-        shadowColor: "#000000",
-        shadowOffset: { width: 6, height: 6 },
-        shadowOpacity: 1,
-        shadowRadius: 9,
-        zIndex: 1
+        borderRadius: 8,
+        elevation: 5,
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        zIndex: 10,
     },
 
     dropdownItem: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
+        padding: 10,
     },
 
     dropdownText: {
-        fontSize: responsiveFontSize(1.7),
-        color: '#898989',
-    }
+        fontSize: responsiveFontSize(2),
+        color: '#333',
+    },
 });
