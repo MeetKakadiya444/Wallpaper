@@ -10,9 +10,9 @@ import ImageWallpaperScreen from "./screens/ImageWallpaperScreen";
 import SearchScreen from "./screens/SearchScreen";
 import SearchWallpaperScreen from "./screens/SearchWallpaperScreen";
 import LikeScreen from "./screens/LikeScreen";
+import  LikeWallpaperScreen from "./screens/LikeWallpaperScreen";
 import  DownloadScreen from "./screens/DownloadScreen";
 
- 
  
 const Stack= createNativeStackNavigator();
 
@@ -29,6 +29,7 @@ export default function App(){
         <Stack.Screen name="SearchScreen" component={SearchScreen}></Stack.Screen>
         <Stack.Screen name="SearchWallpaperScreen" component={SearchWallpaperScreen}></Stack.Screen>
         <Stack.Screen name="LikeScreen" component={LikeScreen}></Stack.Screen>
+        <Stack.Screen name="LikeWallpaperScreen" component={LikeWallpaperScreen}></Stack.Screen>
         <Stack.Screen name="DownloadScreen" component={DownloadScreen}></Stack.Screen>
         
         

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { openDatabase } from "react-native-sqlite-storage"; 
+import { openDatabase } from "react-native-sqlite-storage";
 
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
@@ -21,7 +21,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         // Create table if it doesn't exist
         db.transaction(tx => {
             tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"  
+                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
             );
         });
     }, []);
@@ -42,6 +42,34 @@ export default function HomeWallpaperScreen({ route, navigation }) {
             );
         });
     };
+
+
+    useEffect(() => {
+        // Create table if it doesn't exist
+        db.transaction(tx => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS downloadWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
+            );
+        });
+    }, []);
+
+    const handledownload = () => {
+        // Insert the download wallpaper into the SQLite database
+        db.transaction(tx => {
+            tx.executeSql(
+                "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
+                [imageUrl],
+                () => {
+                    Alert.alert('Success', 'Wallpaper download!');
+                    setSelected('like');
+                },
+                error => {
+                    console.error(error);
+                }
+            );
+        });
+    };
+
 
     return (
         <SafeAreaView style={styles.SafeAreaView}>
@@ -104,7 +132,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => setSelected('download')}
+                    onPress={handledownload}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>

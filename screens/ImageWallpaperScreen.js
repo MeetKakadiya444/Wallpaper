@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity ,Text} from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth, } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { openDatabase } from "react-native-sqlite-storage";
+
+// Initialize SQLite database
+const db = openDatabase({ name: 'wallpaper.db' });
 
 export default function ImageWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
@@ -11,17 +15,67 @@ export default function ImageWallpaperScreen({ route, navigation }) {
     const [selected, setSelected] = useState('home');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
 
+    useEffect(() => {
+        // Create table if it doesn't exist
+        db.transaction(tx => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
+            );
+        });
+    }, []);
 
+    const handleLike = () => {
+        // Insert the liked wallpaper into the SQLite database
+        db.transaction(tx => {
+            tx.executeSql(
+                "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                [imageUrl],
+                () => {
+                    Alert.alert('Success', 'Wallpaper liked and saved!');
+                    setSelected('like');
+                },
+                error => {
+                    console.error(error);
+                }
+            );
+        });
+    };
+
+    useEffect(() => {
+        // Create table if it doesn't exist
+        db.transaction(tx => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS downloadWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
+            );
+        });
+    }, []);
+
+    const handledownload = () => {
+        // Insert the download wallpaper into the SQLite database
+        db.transaction(tx => {
+            tx.executeSql(
+                "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
+                [imageUrl],
+                () => {
+                    Alert.alert('Success', 'Wallpaper download!');
+                    setSelected('like');
+                },
+                error => {
+                    console.error(error);
+                }
+            );
+        });
+    };
     return (
         <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.imageview}>
                 <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
-                    <Image source={require('../assets/close.png')} style={styles.closeIcon} />    
-                </TouchableOpacity>   
+                    <Image source={require('../assets/close.png')} style={styles.closeIcon} />
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.dotButton}
                     onPress={() => setDropdownVisible(!isDropdownVisible)}
-                > 
+                >
                     <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
                 </TouchableOpacity>
             </View>
@@ -37,7 +91,7 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                         <Text style={styles.dropdownText}>Share App</Text>
                     </TouchableOpacity>
                 </View>
-            )}          
+            )}
 
             <View style={styles.container}>
                 <Image
@@ -55,25 +109,13 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => setSelected('paint')}
-                    style={[styles.paintButton, selected === 'paint' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/paint.png')} style={[styles.paintIcon, selected === 'paint' && styles.selectedIcon]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelected('like')}
+                    onPress={handleLike} // Call handleLike on button press
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => setSelected('crop')}
-                    style={[styles.cropButton, selected === 'crop' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/crop.png')} style={[styles.cropIcon, selected === 'crop' && styles.selectedIcon]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelected('download')}
+                    onPress={handledownload}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
@@ -86,8 +128,8 @@ const styles = StyleSheet.create({
     SafeAreaView: {
         flex: 1,
         alignItems: 'center',
-        justifyContent:'space-between',
-        backgroundColor:"#EFF0F0"
+        justifyContent: 'space-between',
+        backgroundColor: "#EFF0F0"
     },
 
     imageview: {
@@ -141,14 +183,14 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         alignItems: 'center',
-        height:responsiveScreenHeight(72),
+        height: responsiveScreenHeight(72),
         width: responsiveScreenWidth(100),
         elevation: 20,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
         shadowOpacity: 1,
         shadowRadius: 8,
-        marginBottom:10,     
+        marginBottom: 10,
     },
 
     image: {
@@ -156,7 +198,7 @@ const styles = StyleSheet.create({
         height: responsiveScreenHeight(72),
         borderRadius: 20,
     },
-   
+
     shadowContainer: {
         height: responsiveHeight(8),
         width: responsiveWidth(92),
@@ -170,7 +212,7 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
     },
 
     homeButton: {
@@ -180,28 +222,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal:12,
+        marginHorizontal: 20,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
         shadowOpacity: 1,
         shadowRadius: 9,
     },
-    
-    paintButton: {
-        height: responsiveHeight(5),
-        width: responsiveWidth(10.5),
-        backgroundColor: "#FFFFFF",
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 40,
-        marginHorizontal:12,
-        elevation: 10,
-        shadowColor: "#000000",
-        shadowOffset: { width: 6, height: 6 },
-        shadowOpacity: 1,
-        shadowRadius: 9,
-    },
+
 
     likeButton: {
         height: responsiveHeight(5),
@@ -210,7 +238,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal:12,
+        marginHorizontal: 20,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -218,20 +246,7 @@ const styles = StyleSheet.create({
         shadowRadius: 9,
     },
 
-    cropButton: {
-        height: responsiveHeight(5),
-        width: responsiveWidth(10.6),
-        backgroundColor: "#FFFFFF",
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 40,
-        marginHorizontal:12,
-        elevation: 10,
-        shadowColor: "#000000",
-        shadowOffset: { width: 6, height: 6 },
-        shadowOpacity: 1,
-        shadowRadius: 9,
-    },
+
 
     downloadButton: {
         height: responsiveHeight(5),
@@ -240,7 +255,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal:12,
+        marginHorizontal: 20,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -254,11 +269,7 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-    paintIcon: {
-        height: 18,
-        width: 20.5,
-        tintColor: "#929292"
-    },
+
 
     likeIcon: {
         height: 16,
@@ -266,11 +277,6 @@ const styles = StyleSheet.create({
         tintColor: "#929292"
     },
 
-    cropIcon: {
-        height: 20,
-        width: 20.5,
-        tintColor: "#929292"
-    },
 
     downloadIcon: {
         height: 22,
@@ -316,4 +322,3 @@ const styles = StyleSheet.create({
         color: '#898989',
     }
 });
-                     

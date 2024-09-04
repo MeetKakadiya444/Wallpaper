@@ -166,13 +166,11 @@ export default function HomeScreen({ navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPressIn={handleSkip1}
-                    onPress={() => setSelected('like')}
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPressIn={handleSkip2}
-                    onPress={() => setSelected('download')}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
