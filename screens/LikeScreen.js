@@ -91,7 +91,7 @@ export default function LikeScreen({ navigation }) {
 const styles = StyleSheet.create({
     imageview: {
         height: responsiveHeight(8),
-        width: responsiveWidth(95),
+        width: responsiveWidth(92),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     likedWallpaper: {
-        width: responsiveWidth(90),
+        width: responsiveWidth(92),
         height: responsiveHeight(20),
         borderRadius: 10,
         marginBottom: 20,

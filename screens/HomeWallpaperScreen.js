@@ -1,8 +1,207 @@
+// import React, { useEffect, useState } from "react";
+// import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
+// import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
+// import { SafeAreaView } from "react-native-safe-area-context";
+// import { openDatabase } from "react-native-sqlite-storage";
+// import RNFS from "react-native-fs";
+// import { PERMISSIONS, request } from "react-native-permissions";
+// import CameraRoll from '@react-native-camera-roll/camera-roll';
+
+
+// // Initialize SQLite database
+// const db = openDatabase({ name: 'wallpaper.db' });
+
+// export default function HomeWallpaperScreen({ route, navigation }) {
+//     const { imageUrl } = route.params;
+
+//     const handleSkip = () => {
+//         navigation.navigate("HomeScreen");
+//     };
+
+//     const [selected, setSelected] = useState('');
+//     const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+//     useEffect(() => {
+//         // Create table if it doesn't exist
+//         db.transaction(tx => {
+//             tx.executeSql(
+//                 "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
+//             );
+//         });
+//     }, []);
+
+//     const handleLike = () => {
+//         // Insert the liked wallpaper into the SQLite database
+//         db.transaction(tx => {
+//             tx.executeSql(
+//                 "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+//                 [imageUrl],
+//                 () => {
+//                     Alert.alert('Success', 'Wallpaper liked and saved!');
+//                     setSelected('like');
+//                 },
+//                 error => {
+//                     console.error(error);
+//                 }
+//             );
+//         });
+//     };
+
+
+//     useEffect(() => {
+//         // Create table if it doesn't exist
+//         db.transaction(tx => {
+//             tx.executeSql(
+//                 "CREATE TABLE IF NOT EXISTS downloadWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
+//             );
+//         });
+//     }, []);
+
+//     const handledownload = () => {
+//         // Insert the download wallpaper into the SQLite database
+//         db.transaction(tx => {
+//             tx.executeSql(
+//                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
+//                 [imageUrl],
+//                 () => {
+//                     Alert.alert('Success', 'Wallpaper download!');
+//                     setSelected('download');
+//                 },
+//                 error => {
+//                     console.error(error);
+//                 }
+//             );
+//         });
+//     };
+
+
+//     // Function to save image to gallery
+//     const saveToGallery = async (imageUrl) => {
+//         try {
+
+//             // Request permission to access storage
+//             const permission = await request(
+//                 Platform.OS === 'android'
+//                     ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+//                     : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
+//             );
+
+//             if (permission === 'granted') {
+//                 // Define file paths
+//                 const fileName = `${new Date().getTime()}.jpg`;
+//                 const downloadDest = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+//                 // Download the image
+//                 const downloadResult = await RNFS.downloadFile({
+//                     fromUrl: imageUrl,
+//                     toFile: downloadDest,
+//                 }).promise;
+
+//                 if (downloadResult.statusCode === 200) {
+//                     // Save to gallery
+//                     await CameraRoll.save(downloadDest, { type: 'photo' });
+//                     Alert.alert('Success', 'Image saved to gallery!');
+//                 } else {
+//                     Alert.alert('Error', 'Failed to download image');
+//                 }
+//             } else {
+//                 Alert.alert('Permission Denied', 'Permission not granted to access storage');
+//             }
+//         } catch (error) {
+//             console.error('Error saving image to gallery:', error);
+//             Alert.alert('Error', 'An error occurred while saving the image');
+//         }
+//     };
+
+//     return (
+//         <SafeAreaView style={styles.SafeAreaView}>
+//             <View style={styles.imageview}>
+//                 <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
+//                     <Image source={require('../assets/close.png')} style={styles.closeIcon} />
+//                 </TouchableOpacity>
+//                 <TouchableOpacity
+//                     style={styles.dotButton}
+//                     onPress={() => setDropdownVisible(!isDropdownVisible)}
+//                 >
+//                     <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
+//                 </TouchableOpacity>
+//             </View>
+//             {isDropdownVisible && (
+//                 <View style={styles.dropdownMenu}>
+//                     <TouchableOpacity style={styles.dropdownItem}>
+//                         <Text style={styles.dropdownText}>Privacy Policy</Text>
+//                     </TouchableOpacity>
+//                     <TouchableOpacity style={styles.dropdownItem}>
+//                         <Text style={styles.dropdownText}>Rate Us</Text>
+//                     </TouchableOpacity>
+//                     <TouchableOpacity style={styles.dropdownItem}>
+//                         <Text style={styles.dropdownText}>Share App</Text>
+//                     </TouchableOpacity>
+//                 </View>
+//             )}
+
+//             <View style={styles.container}>
+//                 <Image
+//                     source={{ uri: imageUrl }}
+//                     style={styles.image}
+//                     resizeMode='cover' // Ensures the image maintains its aspect ratio
+//                 />
+//             </View>
+//             <View style={styles.shadowContainer}>
+//                 <TouchableOpacity
+//                     onPressIn={handleSkip}
+//                     onPress={() => setSelected('home')}
+//                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
+//                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
+//                 </TouchableOpacity>
+
+//                 <TouchableOpacity
+//                     onPress={() => setSelected('paint')}
+//                     style={[styles.paintButton, selected === 'paint' && styles.selectedIconButton]}>
+//                     <Image source={require('../assets/paint.png')} style={[styles.paintIcon, selected === 'paint' && styles.selectedIcon]} />
+//                 </TouchableOpacity>
+
+//                 <TouchableOpacity
+//                     onPress={handleLike} // Call handleLike on button press
+//                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
+//                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
+//                 </TouchableOpacity>
+
+//                 <TouchableOpacity
+//                     onPress={() => setSelected('crop')}
+//                     style={[styles.cropButton, selected === 'crop' && styles.selectedIconButton]}>
+//                     <Image source={require('../assets/crop.png')} style={[styles.cropIcon, selected === 'crop' && styles.selectedIcon]} />
+//                 </TouchableOpacity>
+
+//                 <TouchableOpacity
+//                     onPress={() => {
+//                         handledownload();   // Save download information to the SQLite database
+//                         saveToGallery(imageUrl);  // Save the image to the gallery
+//                     }}
+//                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
+//                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
+//                 </TouchableOpacity>
+//             </View>
+//         </SafeAreaView>
+//     );
+// }
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Text, Alert, Platform } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { openDatabase } from "react-native-sqlite-storage";
+import RNFS from "react-native-fs";
+import { PERMISSIONS, request, check, RESULTS } from "react-native-permissions";
+import CameraRoll from '@react-native-camera-roll/camera-roll';
 
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
@@ -43,7 +242,6 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         });
     };
 
-
     useEffect(() => {
         // Create table if it doesn't exist
         db.transaction(tx => {
@@ -60,8 +258,8 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
                 [imageUrl],
                 () => {
-                    Alert.alert('Success', 'Wallpaper download!');
-                    setSelected('like');
+                    Alert.alert('Success', 'Wallpaper download information saved!');
+                    setSelected('download');
                 },
                 error => {
                     console.error(error);
@@ -70,6 +268,72 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         });
     };
 
+    // Function to check and request storage permission
+    const checkStoragePermission = async () => {
+        const permission = Platform.OS === 'android'
+            ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+            : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY;
+
+        const result = await check(permission);
+
+        switch (result) {
+            case RESULTS.GRANTED:
+                return true;
+            case RESULTS.DENIED:
+                return false;
+            case RESULTS.BLOCKED:
+                Alert.alert('Permission Blocked', 'Please enable storage permission in settings');
+                return false;
+            default:
+                return false;
+        }
+    };
+
+    const requestStoragePermission = async () => {
+        const granted = await checkStoragePermission();
+        if (!granted) {
+            const result = await request(
+                Platform.OS === 'android'
+                    ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+                    : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
+            );
+            return result === RESULTS.GRANTED;
+        }
+        return true;
+    };
+
+    // Function to save image to gallery
+    const saveToGallery = async (imageUrl) => {
+        try {
+            // First, check and request storage permission
+            const permissionGranted = await requestStoragePermission();
+
+            if (permissionGranted) {
+                // Define file paths
+                const fileName = `${new Date().getTime()}.jpg`;
+                const downloadDest = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+                // Download the image
+                const downloadResult = await RNFS.downloadFile({
+                    fromUrl: imageUrl,
+                    toFile: downloadDest,
+                }).promise;
+
+                if (downloadResult.statusCode === 200) {
+                    // Save to gallery
+                    await CameraRoll.save(downloadDest, { type: 'photo' });
+                    Alert.alert('Success', 'Image saved to gallery!');
+                } else {
+                    Alert.alert('Error', 'Failed to download image');
+                }
+            } else {
+                Alert.alert('Permission Denied', 'Permission not granted to access storage');
+            }
+        } catch (error) {
+            console.error('Error saving image to gallery:', error);
+            Alert.alert('Error', 'An error occurred while saving the image');
+        }
+    };
 
     return (
         <SafeAreaView style={styles.SafeAreaView}>
@@ -132,7 +396,10 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={handledownload}
+                    onPress={() => {
+                        handledownload();   // Save download information to the SQLite database
+                        saveToGallery(imageUrl);  // Save the image to the gallery
+                    }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
@@ -140,6 +407,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         </SafeAreaView>
     );
 }
+
 
 const styles = StyleSheet.create({
     SafeAreaView: {

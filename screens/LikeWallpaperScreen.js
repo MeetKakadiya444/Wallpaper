@@ -1,6 +1,11 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { responsiveScreenHeight, responsiveScreenWidth, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
+import { openDatabase } from "react-native-sqlite-storage";
+
+// Initialize SQLite database
+const db = openDatabase({ name: 'wallpaper.db' });
+
 
 export default function LikeWallpaperScreen({ route, navigation }) {
     const { wallpaper, temporaryRemovedIds = [], setTemporaryRemovedIds = () => { } } = route.params || {};
@@ -35,11 +40,10 @@ export default function LikeWallpaperScreen({ route, navigation }) {
             { cancelable: false }
         );
     };
-    
-     
 
+ 
     return (
-        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center',justifyContent:'space-between' }}>
+        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={styles.imageview}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.arrowButton}>
                     <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} />
@@ -56,8 +60,10 @@ export default function LikeWallpaperScreen({ route, navigation }) {
             />
 
             <View style={styles.shadowContainer}>
-            <TouchableOpacity
-                    onPress={() => setSelected('home')}
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate("HomeScreen");
+                    }}
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
                 </TouchableOpacity>
@@ -79,10 +85,13 @@ export default function LikeWallpaperScreen({ route, navigation }) {
                     <Image source={require('../assets/crop.png')} style={[styles.cropIcon, selected === 'crop' && styles.selectedIcon]} />
                 </TouchableOpacity>
 
-                <TouchableOpacitys
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate("DownloadScreen");
+                    }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
-                </TouchableOpacitys>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -91,7 +100,7 @@ export default function LikeWallpaperScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     imageview: {
         height: responsiveHeight(8),
-        width: responsiveWidth(95),
+        width: responsiveWidth(92),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
