@@ -8,10 +8,10 @@ export default function SplashScreen({ navigation }) {
     };
 
     return (
-        <SafeAreaView style={{ backgroundColor: "#FFFFFF", flex: 1, alignItems: "center" }}>
+        <SafeAreaView style={{ backgroundColor: "#FFFFFF", flex: 1, alignItems: "center"}}>
             <View style={{ flexL: 1, marginTop: 30, height: responsiveHeight(57), width: responsiveWidth(100), alignItems: 'center', justifyContent: 'center' }}>
                 <Image source={require('../assets/splash.png')}
-                    style={{ width: responsiveWidth(87.5), height: responsiveHeight(45.2) }} />
+                    style={{ width: responsiveWidth(87.5), height: responsiveHeight(46.2) }} />
             </View>
             <View style={{ height: '26%', width: '100%', alignItems: 'center' }}>
                 <Text style={{ fontSize: responsiveFontSize(5), color: "#545B5E", fontWeight: '500', marginTop: 10 }}>Welcome!</Text>

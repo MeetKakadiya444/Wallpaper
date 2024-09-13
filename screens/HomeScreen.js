@@ -158,7 +158,7 @@ export default function HomeScreen({ navigation }) {
                     />
                 </View>
             </View>
-            <View style={styles.shadowContainer}>
+            {/* <View style={styles.shadowContainer}>
                 <TouchableOpacity
                     onPress={() => setSelected('home')}
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
@@ -174,7 +174,7 @@ export default function HomeScreen({ navigation }) {
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </SafeAreaView>
     );
 }

@@ -61,7 +61,7 @@ export default function LikeScreen({ navigation }) {
                 ))}
             </ScrollView>
 
-            <View style={styles.shadowContainer}>
+            {/* <View style={styles.shadowContainer}>
                 <TouchableOpacity 
                     onPress={() => {
                         navigation.navigate("HomeScreen");
@@ -83,7 +83,7 @@ export default function LikeScreen({ navigation }) {
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </SafeAreaView>
     );
 }

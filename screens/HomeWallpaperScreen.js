@@ -1,12 +1,13 @@
 // import React, { useEffect, useState } from "react";
-// import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
+// import { View, Image, StyleSheet, TouchableOpacity, Text, Alert, Platform } from "react-native";
 // import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
 // import { SafeAreaView } from "react-native-safe-area-context";
 // import { openDatabase } from "react-native-sqlite-storage";
 // import RNFS from "react-native-fs";
-// import { PERMISSIONS, request } from "react-native-permissions";
-// import CameraRoll from '@react-native-camera-roll/camera-roll';
-
+// import { PERMISSIONS, request, check, RESULTS } from "react-native-permissions";
+// import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+// // import ImageEditor from "@react-native-community/image-editor";
+// // import { launchImageLibrary } from "react-native-image-picker";
 
 // // Initialize SQLite database
 // const db = openDatabase({ name: 'wallpaper.db' });
@@ -47,7 +48,6 @@
 //         });
 //     };
 
-
 //     useEffect(() => {
 //         // Create table if it doesn't exist
 //         db.transaction(tx => {
@@ -64,7 +64,7 @@
 //                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
 //                 [imageUrl],
 //                 () => {
-//                     Alert.alert('Success', 'Wallpaper download!');
+//                     Alert.alert('Success', 'Wallpaper download information saved!');
 //                     setSelected('download');
 //                 },
 //                 error => {
@@ -74,19 +74,47 @@
 //         });
 //     };
 
+//     // Function to check and request storage permission
+//     const checkStoragePermission = async () => {
+//         const permission = Platform.OS === 'android'
+//             ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+//             : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY;
 
-//     // Function to save image to gallery
-//     const saveToGallery = async (imageUrl) => {
-//         try {
+//         const result = await check(permission);
 
-//             // Request permission to access storage
-//             const permission = await request(
+//         switch (result) {
+//             case RESULTS.GRANTED:
+//                 return true;
+//             case RESULTS.DENIED:
+//                 return false;
+//             case RESULTS.BLOCKED:
+//                 Alert.alert('Permission Blocked', 'Please enable storage permission in settings');
+//                 return false;
+//             default:
+//                 return false;
+//         }
+//     };
+
+//     const requestStoragePermission = async () => {
+//         const granted = await checkStoragePermission();
+//         if (!granted) {
+//             const result = await request(
 //                 Platform.OS === 'android'
 //                     ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
 //                     : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
 //             );
+//             return result === RESULTS.GRANTED;
+//         }
+//         return true;
+//     };
 
-//             if (permission === 'granted') {
+//     // Function to save image to gallery
+//     const saveToGallery = async (imageUrl) => {
+//         try {
+//             // First, check and request storage permission
+//             const permissionGranted = await requestStoragePermission();
+
+//             if (permissionGranted) {
 //                 // Define file paths
 //                 const fileName = `${new Date().getTime()}.jpg`;
 //                 const downloadDest = `${RNFS.CachesDirectoryPath}/${fileName}`;
@@ -97,6 +125,7 @@
 //                     toFile: downloadDest,
 //                 }).promise;
 
+//                 console.log("----" + downloadResult.statusCode);
 //                 if (downloadResult.statusCode === 200) {
 //                     // Save to gallery
 //                     await CameraRoll.save(downloadDest, { type: 'photo' });
@@ -112,6 +141,47 @@
 //             Alert.alert('Error', 'An error occurred while saving the image');
 //         }
 //     };
+
+//     // const editImage = () => {
+//     //     // Launch the image picker to select an image from the gallery
+//     //     launchImageLibrary(
+//     //         {
+//     //             mediaType: 'photo', // Only allow photos to be selected
+//     //             quality: 1, // Highest quality
+//     //         },
+//     //         async (response) => {
+//     //             if (response.didCancel) {
+//     //                 console.log('User cancelled image picker');
+//     //             } else if (response.errorCode) {
+//     //                 console.log('ImagePicker Error: ', response.errorMessage);
+//     //                 Alert.alert('Error', 'Unable to open image picker');
+//     //             } else if (response.assets && response.assets.length > 0) {
+//     //                 const imageUri = response.assets[0].uri;
+
+//     //                 // Perform edits: for example, applying background blur
+//     //                 const cropData = {
+//     //                     offset: { x: 0, y: 0 },
+//     //                     size: { width: response.assets[0].width, height: response.assets[0].height },
+//     //                     displaySize: { width: response.assets[0].width, height: response.assets[0].height },
+//     //                     resizeMode: 'contain', // Ensures the image maintains aspect ratio
+//     //                 };
+
+//     //                 try {
+//     //                     // Apply background blur using the ImageEditor
+//     //                     const editedImageUri = await ImageEditor.cropImage(imageUri, cropData);
+
+//     //                     // Now you can save the edited image or display it in your app
+//     //                     console.log('Image edited successfully:', editedImageUri);
+//     //                     Alert.alert('Success', 'Image has been edited!');
+
+//     //                 } catch (error) {
+//     //                     console.error('Failed to edit image:', error);
+//     //                     Alert.alert('Error', 'An error occurred while editing the image');
+//     //                 }
+//     //             }
+//     //         }
+//     //     );
+//     // };
 
 //     return (
 //         <SafeAreaView style={styles.SafeAreaView}>
@@ -156,7 +226,10 @@
 //                 </TouchableOpacity>
 
 //                 <TouchableOpacity
-//                     onPress={() => setSelected('paint')}
+//                     onPress={() => {
+//                         setSelected('paint');
+//                         //editImage(); // Trigger the image editing function
+//                     }}
 //                     style={[styles.paintButton, selected === 'paint' && styles.selectedIconButton]}>
 //                     <Image source={require('../assets/paint.png')} style={[styles.paintIcon, selected === 'paint' && styles.selectedIcon]} />
 //                 </TouchableOpacity>
@@ -186,22 +259,17 @@
 //     );
 // }
 
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity, Text, Alert, Platform } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Text, Alert, Platform, Modal } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { openDatabase } from "react-native-sqlite-storage";
 import RNFS from "react-native-fs";
 import { PERMISSIONS, request, check, RESULTS } from "react-native-permissions";
-import CameraRoll from '@react-native-camera-roll/camera-roll';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import ImageEditor from "@react-native-community/image-editor";
+import { verticalScale } from "../Utils";
+import Slider from "@react-native-community/slider";
 
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
@@ -214,7 +282,11 @@ export default function HomeWallpaperScreen({ route, navigation }) {
     };
 
     const [selected, setSelected] = useState('');
+    const [selected2, setSelected2] = useState('blur');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false); // Modal state
+    const [value, setValue] = useState(20);
+
 
     useEffect(() => {
         // Create table if it doesn't exist
@@ -268,7 +340,6 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         });
     };
 
-    // Function to check and request storage permission
     const checkStoragePermission = async () => {
         const permission = Platform.OS === 'android'
             ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
@@ -302,25 +373,21 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         return true;
     };
 
-    // Function to save image to gallery
     const saveToGallery = async (imageUrl) => {
         try {
-            // First, check and request storage permission
             const permissionGranted = await requestStoragePermission();
 
             if (permissionGranted) {
-                // Define file paths
                 const fileName = `${new Date().getTime()}.jpg`;
                 const downloadDest = `${RNFS.CachesDirectoryPath}/${fileName}`;
 
-                // Download the image
                 const downloadResult = await RNFS.downloadFile({
                     fromUrl: imageUrl,
                     toFile: downloadDest,
                 }).promise;
 
+                console.log("----" + downloadResult.statusCode);
                 if (downloadResult.statusCode === 200) {
-                    // Save to gallery
                     await CameraRoll.save(downloadDest, { type: 'photo' });
                     Alert.alert('Success', 'Image saved to gallery!');
                 } else {
@@ -333,6 +400,13 @@ export default function HomeWallpaperScreen({ route, navigation }) {
             console.error('Error saving image to gallery:', error);
             Alert.alert('Error', 'An error occurred while saving the image');
         }
+    };
+
+
+
+    const closeModal = () => {
+        setModalVisible(false); // Close modal
+        setSelected(''); // Clear selected state
     };
 
     return (
@@ -362,13 +436,106 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </View>
             )}
 
+
+
+
             <View style={styles.container}>
                 <Image
                     source={{ uri: imageUrl }}
                     style={styles.image}
-                    resizeMode='cover' // Ensures the image maintains its aspect ratio
+                    resizeMode='cover'
                 />
             </View>
+            {/* Modal for paint editing */}
+            {isModalVisible && (
+                <View style={styles.modalContainer}>
+                    <View style={styles.iconRow}>
+                        <View style={{ marginVertical: 20 }}>
+                            <Slider
+                                style={{ width: 210, height: 40 }}
+                                minimumValue={0}
+                                maximumValue={100}
+                                value={value}
+                                onValueChange={setValue}
+                                minimumTrackTintColor="#000000"
+                                maximumTrackTintColor="#929292"
+                                thumbTintColor="#000000"
+                            />
+                            {/* <Slider
+                                style={{ width: 210, height: 40 }}
+                                minimumValue={0}
+                                maximumValue={1}
+                                value={value}
+                                onValueChange={(val) => {
+                                    setValue(val);
+                                    console.log('ok',val);   
+                                }}
+                                minimumTrackTintColor="#000000"
+                                maximumTrackTintColor="#929292"
+                                thumbTintColor="#000000"
+                            /> */}
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('blur');
+                                }}
+                                style={[selected2 === 'blur' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/blur.png')} style={[styles.icon, selected2 === 'blur' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('brightness');
+                                }}
+                                style={[selected2 === 'brightness' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/brightness.png')} style={[styles.icon, selected2 === 'brightness' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('contrast');
+                                }}
+                                style={[selected2 === 'contrast' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/contrast.png')} style={[styles.icon, selected2 === 'contrast' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('saturation');
+                                }}
+                                style={[selected2 === 'saturation' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/saturation.png')} style={[styles.icon, selected2 === 'saturation' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('sharpness');
+                                }}
+                                style={[selected2 === 'sharpness' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/sharpness.png')} style={[styles.icon, selected2 === 'sharpness' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setSelected2('rgb');
+                                }}
+                                style={[selected2 === 'rgb' && styles.selectedIconButton2]}>
+                                <Image source={require('../assets/rgb.png')} style={[styles.icon, selected2 === 'rgb' && styles.selectedIcon2]} />
+                            </TouchableOpacity>
+
+
+                        </View>
+
+                    </View>
+                </View>
+            )}
+
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
                     onPressIn={handleSkip}
@@ -378,13 +545,16 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => setSelected('paint')}
+                    onPress={() => {
+                        setModalVisible(!isModalVisible);
+                        setSelected('paint');
+                    }}
                     style={[styles.paintButton, selected === 'paint' && styles.selectedIconButton]}>
                     <Image source={require('../assets/paint.png')} style={[styles.paintIcon, selected === 'paint' && styles.selectedIcon]} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={handleLike} // Call handleLike on button press
+                    onPress={handleLike}
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
@@ -397,13 +567,15 @@ export default function HomeWallpaperScreen({ route, navigation }) {
 
                 <TouchableOpacity
                     onPress={() => {
-                        handledownload();   // Save download information to the SQLite database
-                        saveToGallery(imageUrl);  // Save the image to the gallery
+                        handledownload();
+                        saveToGallery(imageUrl);
                     }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
             </View>
+
+
         </SafeAreaView>
     );
 }
@@ -414,7 +586,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: "#EFF0F0"
+        backgroundColor: "#EFF0F0",
+
     },
 
     imageview: {
@@ -485,11 +658,11 @@ const styles = StyleSheet.create({
     },
 
     shadowContainer: {
-        height: responsiveHeight(8),
-        width: responsiveWidth(92),
+        height: responsiveHeight(9),
+        width: responsiveWidth(100),
         backgroundColor: "#FFFFFF",
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
         elevation: 20,
         shadowColor: "#000000",
         shadowOffset: { width: 5, height: 0 },
@@ -507,7 +680,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal: 12,
+        marginHorizontal: 13,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -522,7 +695,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal: 12,
+        marginHorizontal: 13,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -537,7 +710,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal: 12,
+        marginHorizontal: 13,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -552,7 +725,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal: 12,
+        marginHorizontal: 13,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -567,7 +740,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 40,
-        marginHorizontal: 12,
+        marginHorizontal: 13,
         elevation: 10,
         shadowColor: "#000000",
         shadowOffset: { width: 6, height: 6 },
@@ -639,4 +812,37 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(2),
         color: '#333',
     },
+
+    modalContainer: {
+        position: 'absolute',
+        height: responsiveHeight(86),
+        width: responsiveWidth(95),
+        justifyContent: 'flex-end',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+
+    iconRow: {
+        height: responsiveHeight(17),
+        width: responsiveWidth(80),
+        backgroundColor: "#F3F3F3",
+        flexDirection: 'column',
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+
+    },
+    icon: {
+        width: 21,
+        height: 21,
+        marginHorizontal: 10,
+        marginBottom: verticalScale(30),
+        tintColor: "#929292"
+    },
+    selectedIconButton2: {
+        tintColor: "#929292"
+    },
+    selectedIcon2: {
+        tintColor: "#000000"
+    }
 });

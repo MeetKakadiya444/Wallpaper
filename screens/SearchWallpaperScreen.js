@@ -3,6 +3,9 @@ import { View, Image, StyleSheet, TouchableOpacity,Alert } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth, } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { openDatabase } from "react-native-sqlite-storage"; 
+import RNFS from "react-native-fs";
+import { PERMISSIONS,request,check,RESULTS } from "react-native-permissions";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
  // Initialize SQLite database
  const db = openDatabase({ name: 'wallpaper.db' });
@@ -60,7 +63,7 @@ export default function SearchWallpaperScreen({ route, navigation }) {
                 [imageUrl],
                 () => {
                     Alert.alert('Success', 'Wallpaper download!');
-                    setSelected('like');
+                    setSelected('download');
                 },
                 error => {
                     console.error(error);
@@ -69,6 +72,73 @@ export default function SearchWallpaperScreen({ route, navigation }) {
         });
     };
 
+     // Function to check and request storage permission
+     const checkStoragePermission = async () => {
+        const permission = Platform.OS === 'android'
+            ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+            : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY;
+
+        const result = await check(permission);
+
+        switch (result) {
+            case RESULTS.GRANTED:
+                return true;
+            case RESULTS.DENIED:
+                return false;
+            case RESULTS.BLOCKED:
+                Alert.alert('Permission Blocked', 'Please enable storage permission in settings');
+                return false;
+            default:
+                return false;
+        }
+    };
+
+    const requestStoragePermission = async () => {
+        const granted = await checkStoragePermission();
+        if (!granted) {
+            const result = await request(
+                Platform.OS === 'android'
+                    ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
+                    : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
+            );
+            return result === RESULTS.GRANTED;
+        }
+        return true;
+    };
+
+    // Function to save image to gallery
+    const saveToGallery = async (imageUrl) => {
+        try {
+            // First, check and request storage permission
+            const permissionGranted = await requestStoragePermission();
+
+            if (permissionGranted) {
+                // Define file paths
+                const fileName = `${new Date().getTime()}.jpg`;
+                const downloadDest = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+                // Download the image
+                const downloadResult = await RNFS.downloadFile({
+                    fromUrl: imageUrl,
+                    toFile: downloadDest,
+                }).promise;
+
+                console.log("----" + downloadResult.statusCode);
+                if (downloadResult.statusCode === 200) {
+                    // Save to gallery
+                 await CameraRoll.save(downloadDest, { type: 'photo' });
+                    Alert.alert('Success', 'Image saved to gallery!');
+                } else {
+                    Alert.alert('Error', 'Failed to download image');
+                }
+            } else {
+                Alert.alert('Permission Denied', 'Permission not granted to access storage');
+            }
+        } catch (error) {
+            console.error('Error saving image to gallery:', error);
+            Alert.alert('Error', 'An error occurred while saving the image');
+        }
+    };
     return (
         <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.imageview}>
@@ -103,7 +173,10 @@ export default function SearchWallpaperScreen({ route, navigation }) {
 
 
                 <TouchableOpacity
-                    onPress={handledownload}
+                      onPress={() => {
+                        handledownload();   // Save download information to the SQLite database
+                       saveToGallery(imageUrl);  // Save the image to the gallery
+                   }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
