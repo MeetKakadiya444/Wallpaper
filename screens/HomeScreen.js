@@ -27,6 +27,13 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate("DownloadScreen");
     };
 
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+          navigation.setOptions({ tabBarVisible: true });
+        });
+      
+        return unsubscribe;
+      }, [navigation]);
 
     useEffect(() => {
         const fetchImages = async () => {

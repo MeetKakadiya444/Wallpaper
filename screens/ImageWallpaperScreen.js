@@ -12,9 +12,7 @@ const db = openDatabase({ name: 'wallpaper.db' });
 
 export default function ImageWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
-    const handleSkip = () => {
-        navigation.navigate("HomeScreen");
-    };
+     
     const [selected, setSelected] = useState('home');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
 
@@ -139,7 +137,7 @@ export default function ImageWallpaperScreen({ route, navigation }) {
     return (
         <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.imageview}>
-                <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
+                <TouchableOpacity   onPress={() => navigation.goBack()} style={styles.closeButton}>
                     <Image source={require('../assets/close.png')} style={styles.closeIcon} />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -172,8 +170,11 @@ export default function ImageWallpaperScreen({ route, navigation }) {
             </View>
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
-                    onPressIn={handleSkip}
-                    onPress={() => setSelected('home')}
+                    onPress={() => {
+                        setSelected('home');
+                        navigation.navigate('Home'); // Navigates to the Home screen
+                    }}
+                    onPressin={() => setSelected('home')}
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
                 </TouchableOpacity>

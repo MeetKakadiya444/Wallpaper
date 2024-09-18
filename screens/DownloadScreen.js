@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from "react-native";
+import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform,FlatList } from "react-native";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { openDatabase } from "react-native-sqlite-storage";
 
@@ -48,7 +48,16 @@ export default function DownloadScreen({ navigation }) {
 
     // Filter wallpapers based on temporary removed ids
     const filteredWallpapers = likedWallpapers.filter(w => !temporaryRemovedIds.includes(w.id));
-
+    const renderItem = ({ item }) => (
+        <TouchableOpacity 
+             >
+            <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.likedWallpaper}
+                resizeMode="cover"
+            />
+        </TouchableOpacity>
+    );
     return (
         <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center' }}>
             <View style={styles.imageview}>
@@ -60,7 +69,16 @@ export default function DownloadScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollViewContainer} showsVerticalScrollIndicator={false}>
+            <FlatList
+            showsVerticalScrollIndicator={false}
+            data={filteredWallpapers.slice().reverse()}// Reverse the data array here
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString() }
+            numColumns={2}
+            contentContainerStyle={styles.scrollViewContainer}
+        />
+
+            {/* <ScrollView contentContainerStyle={styles.scrollViewContainer} showsVerticalScrollIndicator={false}>
                 {filteredWallpapers.slice().reverse().map((wallpaper, index) => (
                     <TouchableOpacity
                         key={index}
@@ -72,7 +90,7 @@ export default function DownloadScreen({ navigation }) {
                         />
                     </TouchableOpacity>
                 ))}
-            </ScrollView>
+            </ScrollView> */}
 
             {/* <View style={styles.shadowContainer}>
                 <TouchableOpacity
@@ -169,10 +187,11 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     likedWallpaper: {
-        width: responsiveWidth(92),
+        width: responsiveWidth(43),
         height: responsiveHeight(20),
         borderRadius: 10,
-        marginBottom: 20,
+        marginHorizontal:7,
+        marginVertical:7 
     },
     homeButton: {
         height: responsiveHeight(5),

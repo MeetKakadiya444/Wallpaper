@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView,FlatList } from "react-native";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { openDatabase } from "react-native-sqlite-storage";
 
@@ -9,7 +9,6 @@ const db = openDatabase({ name: 'wallpaper.db' });
 export default function LikeScreen({ navigation }) {
     const [likedWallpapers, setLikedWallpapers] = useState([]);
     const [temporaryRemovedIds, setTemporaryRemovedIds] = useState([]);
-    const [selected, setSelected] = useState('like');
 
     useEffect(() => {
         // Fetch liked wallpapers from SQLite database
@@ -35,9 +34,18 @@ export default function LikeScreen({ navigation }) {
 
     // Filter wallpapers based on temporary removed ids
     const filteredWallpapers = likedWallpapers.filter(w => !temporaryRemovedIds.includes(w.id));
-
+        const renderItem = ({ item }) => (
+            <TouchableOpacity 
+                onPress={() => navigation.navigate("LikeWallpaperScreen", { wallpaper: item, temporaryRemovedIds, setTemporaryRemovedIds })}>
+                <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.likedWallpaper}
+                    resizeMode="cover"
+                />
+            </TouchableOpacity>
+        );
     return (
-        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center' }}>
+        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center',justifyContent:'center' }}>
             <View style={styles.imageview}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.arrowButton}>
                     <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} />
@@ -46,44 +54,15 @@ export default function LikeScreen({ navigation }) {
                     <Image source={require('../assets/dot.png')} style={styles.dotIcon} />
                 </TouchableOpacity>
             </View>
+            <FlatList
+            showsVerticalScrollIndicator={false}
+            data={filteredWallpapers.slice().reverse()}// Reverse the data array here
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString() }
+            numColumns={2}
+            contentContainerStyle={styles.scrollViewContainer}
+        />
 
-            <ScrollView contentContainerStyle={styles.scrollViewContainer} showsVerticalScrollIndicator={false}>
-                {filteredWallpapers.slice().reverse().map((wallpaper, index) => (
-                    <TouchableOpacity 
-                        key={index} 
-                        onPress={() => navigation.navigate("LikeWallpaperScreen", { wallpaper, temporaryRemovedIds, setTemporaryRemovedIds })}>
-                        <Image
-                            source={{ uri: wallpaper.imageUrl }}
-                            style={styles.likedWallpaper}
-                            resizeMode="cover"
-                        />
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
-
-            {/* <View style={styles.shadowContainer}>
-                <TouchableOpacity 
-                    onPress={() => {
-                        navigation.navigate("HomeScreen");
-                    }}
-                    style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelected('like')}
-                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                    onPress={() => {
-                        navigation.navigate("DownloadScreen");
-                    }}
-                    style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
-                </TouchableOpacity>
-            </View> */}
         </SafeAreaView>
     );
 }
@@ -132,29 +111,17 @@ const styles = StyleSheet.create({
         width: 5,
         tintColor: "#929292"
     },
-    shadowContainer: {
-        height: responsiveHeight(8),
-        width: responsiveWidth(100),
-        backgroundColor: "#FFFFFF",
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        elevation: 20,
-        shadowColor: "#000000",
-        shadowOffset: { width: 5, height: 0 },
-        shadowOpacity: 1,
-        shadowRadius: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+     
     scrollViewContainer: {
         padding: 10,
     },
     likedWallpaper: {
-        width: responsiveWidth(92),
+        width: responsiveWidth(43),
         height: responsiveHeight(20),
         borderRadius: 10,
-        marginBottom: 20,
+        marginVertical:7,
+        marginHorizontal:7
+        
     },
     homeButton: {
         height: responsiveHeight(5),

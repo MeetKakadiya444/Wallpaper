@@ -3,8 +3,8 @@ import { Text, View, SafeAreaView, Image, TouchableOpacity } from "react-native"
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 
 export default function SplashScreen({ navigation }) {
-    const handleSkip = () => {
-        navigation.navigate("HomeScreen");
+    const handleGoPress = () => {
+        navigation.navigate("Tabs");
     };
 
     return (
@@ -20,7 +20,7 @@ export default function SplashScreen({ navigation }) {
                 <Text style={{ color: "#A09898", fontSize: responsiveFontSize(2.5), fontWeight: '400', marginTop: 10 }}>Let's go to explorer.</Text>
             </View>
             <View style={{ height: '10%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                <TouchableOpacity onPress={handleSkip} style={{ backgroundColor: "#4794FF", height: responsiveHeight(5.5), width: responsiveWidth(26), borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={handleGoPress}   style={{ backgroundColor: "#4794FF", height: responsiveHeight(5.5), width: responsiveWidth(26), borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontSize: responsiveFontSize(2.5), fontWeight: '700', color: "#363D3F" }}>GO!</Text>
                 </TouchableOpacity>
             </View>

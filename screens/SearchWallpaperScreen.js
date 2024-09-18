@@ -15,9 +15,8 @@ export default function SearchWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
     const handleSkip = () => {
         navigation.navigate("SearchScreen");
-    }; const handleSkip1 = () => {
-        navigation.navigate("HomeScreen");
-    };
+    };  
+    
     const [selected, setSelected] = useState('home');
 
    
@@ -159,8 +158,11 @@ export default function SearchWallpaperScreen({ route, navigation }) {
             </View>
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
-                    onPressIn={handleSkip1}
-                    onPress={() => setSelected('home')}
+                     onPress={() => {
+                        setSelected('home');
+                        navigation.navigate('Home'); // Navigates to the Home screen
+                    }}
+                    onPressIn={() => setSelected('home')}
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
                 </TouchableOpacity>

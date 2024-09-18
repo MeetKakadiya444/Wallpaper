@@ -61,8 +61,9 @@ export default function LikeWallpaperScreen({ route, navigation }) {
 
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate("HomeScreen");
+                     onPress={() => {
+                        setSelected('home');
+                        navigation.navigate('Home'); // Navigates to the Home screen
                     }}
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />

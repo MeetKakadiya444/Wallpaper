@@ -190,7 +190,10 @@ export default function  SearchScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.imageview}>
-                <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
+            <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={styles.closeButton}
+                >
                     <Image source={require('../assets/close.png')} style={styles.closeIcon} />
                 </TouchableOpacity>
 
