@@ -83,46 +83,6 @@ useFocusEffect(
             contentContainerStyle={styles.scrollViewContainer}
         />
 
-            {/* <ScrollView contentContainerStyle={styles.scrollViewContainer} showsVerticalScrollIndicator={false}>
-                {filteredWallpapers.slice().reverse().map((wallpaper, index) => (
-                    <TouchableOpacity
-                        key={index}
-                    >
-                        <Image
-                            source={{ uri: wallpaper.imageUrl }}
-                            style={styles.likedWallpaper}
-                            resizeMode="cover"
-                        />
-                    </TouchableOpacity>
-                ))}
-            </ScrollView> */}
-
-            {/* <View style={styles.shadowContainer}>
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate("HomeScreen");
-                    }}
-                    style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate("LikeScreen");
-                    }}
-                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => {
-                        setSelected('download');
-                        navigation.navigate("DownloadScreen");
-                    }}
-                    style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
-                </TouchableOpacity>
-            </View> */}
         </SafeAreaView>
     );
 }
