@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useCallback} from "react";
 import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform,FlatList } from "react-native";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { openDatabase } from "react-native-sqlite-storage";
-
+import { useFocusEffect } from "@react-navigation/native";
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
 
@@ -11,7 +11,7 @@ export default function DownloadScreen({ navigation }) {
     const [temporaryRemovedIds, setTemporaryRemovedIds] = useState([]);
     const [selected, setSelected] = useState('download');
 
-    useEffect(() => {
+    const fetchDownloadWallpapers= () => {
         // Create the table if it doesn't exist
         db.transaction(tx => {
             tx.executeSql(
@@ -44,8 +44,13 @@ export default function DownloadScreen({ navigation }) {
                 }
             );
         });
-    }, []);
-
+    }
+useFocusEffect(
+        useCallback(() => {
+            // Fetch data when the screen is focused
+            fetchDownloadWallpapers();
+        }, [])
+    );
     // Filter wallpapers based on temporary removed ids
     const filteredWallpapers = likedWallpapers.filter(w => !temporaryRemovedIds.includes(w.id));
     const renderItem = ({ item }) => (

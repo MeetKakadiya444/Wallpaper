@@ -13,8 +13,9 @@ const db = openDatabase({ name: 'wallpaper.db' });
 export default function ImageWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
      
-    const [selected, setSelected] = useState('home');
+    const [selected, setSelected] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const [isLiked, setIsLiked] = useState(false); // State to track if wallpaper is liked
 
     useEffect(() => {
         // Create table if it doesn't exist
@@ -23,23 +24,78 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                 "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
             );
         });
-    }, []);
-
-    const handleLike = () => {
-        // Insert the liked wallpaper into the SQLite database
+      // Check if the current wallpaper is already liked
         db.transaction(tx => {
             tx.executeSql(
-                "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                "SELECT * FROM likedWallpapers WHERE imageUrl = ?;",
                 [imageUrl],
-                () => {
-                    Alert.alert('Success', 'Wallpaper liked and saved!');
-                    setSelected('like');
+                (tx, results) => {
+                    if (results.rows.length > 0) {
+                        setIsLiked(true); // Wallpaper is liked
+                        setSelected('like');
+                    } else {
+                        setIsLiked(false); // Wallpaper is not liked
+                    }
                 },
                 error => {
                     console.error(error);
                 }
             );
         });
+    }, [imageUrl]); // Runs when imageUrl changes
+
+    const handleLike = () => {
+        if (isLiked) {
+            // If already liked, show an alert to confirm removal
+            Alert.alert(
+                "Remove Wallpaper",
+                "Are you sure you want to remove this wallpaper from your likes?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                    },
+                    {
+                        text: "Remove",
+                        onPress: () => {
+                            // Remove wallpaper from the SQLite database
+                            db.transaction(tx => {
+                                tx.executeSql(
+                                    "DELETE FROM likedWallpapers WHERE imageUrl = ?;",
+                                    [imageUrl],
+                                    () => {
+                                        Alert.alert('Success', 'Wallpaper removed from likes!');
+                                        setIsLiked(false); // Set the state to unliked
+                                        setSelected(''); // Clear selected state
+                                    },
+                                    error => {
+                                        console.error(error);
+                                    }
+                                );
+                            });
+                        }
+                    }
+                ],
+                { cancelable: false }
+            );
+        } else {
+            // If not liked, add the wallpaper to the SQLite database
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                    [imageUrl],
+                    () => {
+                        Alert.alert('Success', 'Wallpaper liked and saved!');
+                        setIsLiked(true); // Set the state to liked
+                        setSelected('like');
+                    },
+                    error => {
+                        console.error(error);
+                    }
+                );
+            });
+        }
     };
 
     useEffect(() => {
@@ -178,13 +234,15 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                     style={[styles.homeButton, selected === 'home' && styles.selectedIconButton]}>
                     <Image source={require('../assets/home.png')} style={[styles.homeIcon, selected === 'home' && styles.selectedIcon]} />
                 </TouchableOpacity>
-
                 <TouchableOpacity
-                    onPress={handleLike} // Call handleLike on button press
-                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
+                    onPress={handleLike}
+                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}
+                >
+                    <Image
+                        source={require('../assets/like.png')}
+                        style={[styles.likeIcon, isLiked ? styles.selectedIcon1 : styles.selectedIcon2]} // Ensure proper styling based on isLiked
+                    />
                 </TouchableOpacity>
-
                 <TouchableOpacity
                     onPress={() => {
                         handledownload();   // Save download information to the SQLite database
@@ -368,6 +426,9 @@ const styles = StyleSheet.create({
 
     selectedIcon1: {
         tintColor: '#FA3F3F',
+    },
+    selectedIcon2: {
+        tintColor: "#929292"
     },
 
     dropdownMenu: {

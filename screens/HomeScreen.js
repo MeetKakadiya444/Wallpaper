@@ -20,12 +20,7 @@ export default function HomeScreen({ navigation }) {
     const [apiType, setApiType] = useState('latest');
     const [selected, setSelected] = useState('home');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
-    const handleSkip1 = () => {
-        navigation.navigate("LikeScreen");
-    };
-    const handleSkip2 = () => {
-        navigation.navigate("DownloadScreen");
-    };
+    
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {

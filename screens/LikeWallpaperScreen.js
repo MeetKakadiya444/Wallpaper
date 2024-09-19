@@ -75,7 +75,7 @@ export default function LikeWallpaperScreen({ route, navigation }) {
                     <Image source={require('../assets/paint.png')} style={[styles.paintIcon, selected === 'paint' && styles.selectedIcon]} />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleLikePress}
+                <TouchableOpacity  
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>

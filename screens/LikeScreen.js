@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, ScrollView,FlatList } from "react-native";
+// 
+import React, { useEffect, useState, useCallback } from "react";
+import { View, SafeAreaView, Image, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { openDatabase } from "react-native-sqlite-storage";
+import { useFocusEffect } from '@react-navigation/native';
 
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
@@ -10,7 +12,7 @@ export default function LikeScreen({ navigation }) {
     const [likedWallpapers, setLikedWallpapers] = useState([]);
     const [temporaryRemovedIds, setTemporaryRemovedIds] = useState([]);
 
-    useEffect(() => {
+    const fetchLikedWallpapers = () => {
         // Fetch liked wallpapers from SQLite database
         db.transaction(tx => {
             tx.executeSql(
@@ -29,23 +31,31 @@ export default function LikeScreen({ navigation }) {
                 }
             );
         });
-    }, []);
-    
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            // Fetch data when the screen is focused
+            fetchLikedWallpapers();
+        }, [])
+    );
 
     // Filter wallpapers based on temporary removed ids
     const filteredWallpapers = likedWallpapers.filter(w => !temporaryRemovedIds.includes(w.id));
-        const renderItem = ({ item }) => (
-            <TouchableOpacity 
-                onPress={() => navigation.navigate("LikeWallpaperScreen", { wallpaper: item, temporaryRemovedIds, setTemporaryRemovedIds })}>
-                <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.likedWallpaper}
-                    resizeMode="cover"
-                />
-            </TouchableOpacity>
-        );
+    
+    const renderItem = ({ item }) => (
+        <TouchableOpacity 
+            onPress={() => navigation.navigate("LikeWallpaperScreen", { wallpaper: item, temporaryRemovedIds, setTemporaryRemovedIds })}>
+            <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.likedWallpaper}
+                resizeMode="cover"
+            />
+        </TouchableOpacity>
+    );
+    
     return (
-        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center',justifyContent:'center' }}>
+        <SafeAreaView style={{ backgroundColor: "#EFF0F0", flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <View style={styles.imageview}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.arrowButton}>
                     <Image source={require('../assets/arrow.png')} style={styles.arrowIcon} />
@@ -55,17 +65,17 @@ export default function LikeScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
             <FlatList
-            showsVerticalScrollIndicator={false}
-            data={filteredWallpapers.slice().reverse()}// Reverse the data array here
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString() }
-            numColumns={2}
-            contentContainerStyle={styles.scrollViewContainer}
-        />
-
+                showsVerticalScrollIndicator={false}
+                data={filteredWallpapers.slice().reverse()} // Reverse the data array here
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={2}
+                contentContainerStyle={styles.scrollViewContainer}
+            />
         </SafeAreaView>
     );
 }
+
 
 const styles = StyleSheet.create({
     imageview: {

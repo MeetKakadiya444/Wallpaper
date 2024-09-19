@@ -1,49 +1,103 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity,Alert } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth, } from "react-native-responsive-dimensions";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { openDatabase } from "react-native-sqlite-storage"; 
+import { openDatabase } from "react-native-sqlite-storage";
 import RNFS from "react-native-fs";
-import { PERMISSIONS,request,check,RESULTS } from "react-native-permissions";
+import { PERMISSIONS, request, check, RESULTS } from "react-native-permissions";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
- // Initialize SQLite database
- const db = openDatabase({ name: 'wallpaper.db' });
+// Initialize SQLite database
+const db = openDatabase({ name: 'wallpaper.db' });
 
 
 export default function SearchWallpaperScreen({ route, navigation }) {
     const { imageUrl } = route.params;
     const handleSkip = () => {
         navigation.navigate("SearchScreen");
-    };  
-    
-    const [selected, setSelected] = useState('home');
+    };
+    const [selected, setSelected] = useState('');
+    const [isLiked, setIsLiked] = useState(false); // State to track if wallpaper is liked
 
-   
     useEffect(() => {
         // Create table if it doesn't exist
         db.transaction(tx => {
             tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"  
+                "CREATE TABLE IF NOT EXISTS likedWallpapers (id INTEGER PRIMARY KEY AUTOINCREMENT, imageUrl TEXT);"
             );
         });
-    }, []);
-
-    const handleLike = () => {
-        // Insert the liked wallpaper into the SQLite database
+     // Check if the current wallpaper is already liked
         db.transaction(tx => {
             tx.executeSql(
-                "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                "SELECT * FROM likedWallpapers WHERE imageUrl = ?;",
                 [imageUrl],
-                () => {
-                    Alert.alert('Success', 'Wallpaper liked and saved!');
-                    setSelected('like');
+                (tx, results) => {
+                    if (results.rows.length > 0) {
+                        setIsLiked(true); // Wallpaper is liked
+                        setSelected('like');
+                    } else {
+                        setIsLiked(false); // Wallpaper is not liked
+                    }
                 },
                 error => {
                     console.error(error);
                 }
             );
         });
+    }, [imageUrl]); // Runs when imageUrl changes
+
+    const handleLike = () => {
+        if (isLiked) {
+            // If already liked, show an alert to confirm removal
+            Alert.alert(
+                "Remove Wallpaper",
+                "Are you sure you want to remove this wallpaper from your likes?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                    },
+                    {
+                        text: "Remove",
+                        onPress: () => {
+                            // Remove wallpaper from the SQLite database
+                            db.transaction(tx => {
+                                tx.executeSql(
+                                    "DELETE FROM likedWallpapers WHERE imageUrl = ?;",
+                                    [imageUrl],
+                                    () => {
+                                        Alert.alert('Success', 'Wallpaper removed from likes!');
+                                        setIsLiked(false); // Set the state to unliked
+                                        setSelected(''); // Clear selected state
+                                    },
+                                    error => {
+                                        console.error(error);
+                                    }
+                                );
+                            });
+                        }
+                    }
+                ],
+                { cancelable: false }
+            );
+        } else {
+            // If not liked, add the wallpaper to the SQLite database
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO likedWallpapers (imageUrl) VALUES (?);",
+                    [imageUrl],
+                    () => {
+                        Alert.alert('Success', 'Wallpaper liked and saved!');
+                        setIsLiked(true); // Set the state to liked
+                        setSelected('like');
+                    },
+                    error => {
+                        console.error(error);
+                    }
+                );
+            });
+        }
     };
     useEffect(() => {
         // Create table if it doesn't exist
@@ -71,8 +125,8 @@ export default function SearchWallpaperScreen({ route, navigation }) {
         });
     };
 
-     // Function to check and request storage permission
-     const checkStoragePermission = async () => {
+    // Function to check and request storage permission
+    const checkStoragePermission = async () => {
         const permission = Platform.OS === 'android'
             ? PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
             : PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY;
@@ -125,7 +179,7 @@ export default function SearchWallpaperScreen({ route, navigation }) {
                 console.log("----" + downloadResult.statusCode);
                 if (downloadResult.statusCode === 200) {
                     // Save to gallery
-                 await CameraRoll.save(downloadDest, { type: 'photo' });
+                    await CameraRoll.save(downloadDest, { type: 'photo' });
                     Alert.alert('Success', 'Image saved to gallery!');
                 } else {
                     Alert.alert('Error', 'Failed to download image');
@@ -158,7 +212,7 @@ export default function SearchWallpaperScreen({ route, navigation }) {
             </View>
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
-                     onPress={() => {
+                    onPress={() => {
                         setSelected('home');
                         navigation.navigate('Home'); // Navigates to the Home screen
                     }}
@@ -168,17 +222,20 @@ export default function SearchWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={handleLike} // Call handleLike on button press
-                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
-                    <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
+                    onPress={handleLike}
+                    style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}
+                >
+                    <Image
+                        source={require('../assets/like.png')}
+                        style={[styles.likeIcon, isLiked ? styles.selectedIcon1 : styles.selectedIcon2]} // Ensure proper styling based on isLiked
+                    />
                 </TouchableOpacity>
 
-
                 <TouchableOpacity
-                      onPress={() => {
+                    onPress={() => {
                         handledownload();   // Save download information to the SQLite database
-                       saveToGallery(imageUrl);  // Save the image to the gallery
-                   }}
+                        saveToGallery(imageUrl);  // Save the image to the gallery
+                    }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />
                 </TouchableOpacity>
@@ -366,5 +423,8 @@ const styles = StyleSheet.create({
 
     selectedIcon1: {
         tintColor: '#FA3F3F',
+    },
+    selectedIcon2: {
+        tintColor: "#929292"
     },
 });
