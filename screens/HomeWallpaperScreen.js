@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, TouchableOpacity, Text, Alert, Platform, Modal } from "react-native";
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from "react-native-responsive-dimensions";
@@ -10,6 +9,7 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import ImageEditor from "@react-native-community/image-editor";
 import { verticalScale } from "../Utils";
 import Slider from "@react-native-community/slider";
+ 
 
 // Initialize SQLite database
 const db = openDatabase({ name: 'wallpaper.db' });
@@ -20,6 +20,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
     const [selected2, setSelected2] = useState('blur');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false); // Modal state
+    const [isModalVisible1, setModalVisible1] = useState(false); // Modal state
     const [value, setValue] = useState(20);
     const [isLiked, setIsLiked] = useState(false); // State to track if wallpaper is liked
 
@@ -104,10 +105,6 @@ export default function HomeWallpaperScreen({ route, navigation }) {
         }
     };
 
-
-
-
-
     const handledownload = () => {
         // Insert the download wallpaper into the SQLite database
         db.transaction(tx => {
@@ -185,7 +182,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
             Alert.alert('Error', 'An error occurred while saving the image');
         }
     };
-
+    
     return (
         <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.imageview}>
@@ -297,6 +294,34 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 </View>
             )}
 
+            
+             {isModalVisible1 && (
+                <View style={styles.modalContainer}>
+                    <View style={styles.iconRow1}>
+                            <View style={{marginTop:20,height:responsiveHeight(3),width:responsiveWidth(50)}}>
+                                <Text style={{fontSize:16,fontWeight:'700',color:"#323232"}}>Set as :</Text>
+                            </View>
+                            <TouchableOpacity   style={{flexDirection:'row',width:responsiveScreenHeight(18),marginTop:20,alignItems:'center',justifyContent:'center'}}>
+                                <Image source={require('../assets/homescreen.png')} style={{height:30,width:17}}></Image>
+                                <Text style={{marginLeft:10,fontSize:12,fontWeight:'400',color:"#323232"}}>HOME SCREEN</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity style={{flexDirection:'row',width:responsiveScreenHeight(18),marginTop:20,alignItems:'center',justifyContent:'center'}}>
+                                <Image source={require('../assets/lockscreen.png')} style={{height:30,width:17}}></Image>
+                                <Text style={{marginLeft:10,fontSize:12,fontWeight:'400',color:"#323232"}}>HOME SCREEN</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity style={{flexDirection:'row',width:responsiveScreenHeight(18),marginTop:20,alignItems:'center',justifyContent:'center'}}>
+                                <Image source={require('../assets/bothscreen.png')} style={{height:30,width:21}}></Image>
+                                <Text style={{marginLeft:10,fontSize:12,fontWeight:'400',color:"#323232"}}>HOME SCREEN</Text>
+                            </TouchableOpacity>
+                            
+
+                       
+                    </View>
+                </View>
+            )}
+
             <View style={styles.shadowContainer}>
                 <TouchableOpacity
                     onPress={() => {
@@ -328,7 +353,10 @@ export default function HomeWallpaperScreen({ route, navigation }) {
 
 
                 <TouchableOpacity
-                    onPress={() => setSelected('crop')}
+                    onPress={() => {
+                        setModalVisible1(!isModalVisible1)
+                        setSelected('crop');
+                    }}
                     style={[styles.cropButton, selected === 'crop' && styles.selectedIconButton]}>
                     <Image source={require('../assets/crop.png')} style={[styles.cropIcon, selected === 'crop' && styles.selectedIcon]} />
                 </TouchableOpacity>
@@ -584,14 +612,13 @@ const styles = StyleSheet.create({
     modalContainer: {
         position: 'absolute',
         height: responsiveHeight(86),
-        width: responsiveWidth(95),
         justifyContent: 'flex-end',
         borderRadius: 10,
         alignItems: 'center',
     },
 
     iconRow: {
-        height: responsiveHeight(17),
+        height: responsiveHeight(20),
         width: responsiveWidth(80),
         backgroundColor: "#F3F3F3",
         flexDirection: 'column',
@@ -609,6 +636,13 @@ const styles = StyleSheet.create({
     },
     selectedIcon3: {
         tintColor: "#000000"
-    }
+    },
 
+    iconRow1: {
+        height: responsiveHeight(30),
+        width: responsiveWidth(60),
+        backgroundColor: "#F3F3F3",  
+        borderRadius:20,
+        alignItems:'center',
+    }, 
 });
