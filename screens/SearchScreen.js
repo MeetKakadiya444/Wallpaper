@@ -17,7 +17,7 @@ const getPhotosFromApi = async (page, query) => {
     }
 };
 
-export default function  SearchScreen({ navigation }) {
+export default function SearchScreen({ navigation }) {
     const handleSkip = () => {
         navigation.navigate("HomeScreen");
     };
@@ -74,7 +74,7 @@ export default function  SearchScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.imageview}>
-            <TouchableOpacity
+                <TouchableOpacity
                     onPress={() => navigation.goBack()}
                     style={styles.closeButton}
                 >
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         alignItems: 'center',
     },
-    
+
     image: {
         width: '100%',
         height: '100%',
