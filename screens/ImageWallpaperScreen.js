@@ -114,7 +114,7 @@ export default function ImageWallpaperScreen({ route, navigation }) {
                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
                 [imageUrl],
                 () => {
-                    Alert.alert('Success', 'Wallpaper download!');
+                     
                     setSelected('download');
                 },
                 error => {
@@ -123,6 +123,7 @@ export default function ImageWallpaperScreen({ route, navigation }) {
             );
         });
     };
+    
     // Function to check and request storage permission
     const checkStoragePermission = async () => {
         const permission = Platform.OS === 'android'

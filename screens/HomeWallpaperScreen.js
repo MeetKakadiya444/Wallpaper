@@ -112,7 +112,7 @@ export default function HomeWallpaperScreen({ route, navigation }) {
                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
                 [imageUrl],
                 () => {
-                    Alert.alert('Success', 'Wallpaper download information saved!');
+                   
                     setSelected('download');
                 },
                 error => {

@@ -76,6 +76,7 @@ export default function LikeWallpaperScreen({ route, navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity  
+                 onPress={handleLikePress}
                     style={[styles.likeButton, selected === 'like' && styles.selectedIconButton]}>
                     <Image source={require('../assets/like.png')} style={[styles.likeIcon, selected === 'like' && styles.selectedIcon1]} />
                 </TouchableOpacity>
@@ -88,7 +89,7 @@ export default function LikeWallpaperScreen({ route, navigation }) {
 
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate("DownloadScreen");
+                        navigation.navigate("Download");
                     }}
                     style={[styles.downloadButton, selected === 'download' && styles.selectedIconButton]}>
                     <Image source={require('../assets/download.png')} style={[styles.downloadIcon, selected === 'download' && styles.selectedIcon]} />

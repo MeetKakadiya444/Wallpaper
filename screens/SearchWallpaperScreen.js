@@ -115,7 +115,7 @@ export default function SearchWallpaperScreen({ route, navigation }) {
                 "INSERT INTO downloadWallpapers (imageUrl) VALUES (?);",
                 [imageUrl],
                 () => {
-                    Alert.alert('Success', 'Wallpaper download!');
+                    
                     setSelected('download');
                 },
                 error => {
